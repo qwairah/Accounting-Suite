@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>قـويــره سوفت - نظام المحاسبة المالي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a1a0f;
+    --bg2: #060e08;
+    --gold: #D4AF37;
+    --gold-dim: rgba(212,175,55,0.6);
+    --green: #22c55e;
+    --card: rgba(14,50,25,0.6);
+    --border: rgba(212,175,55,0.25);
+    --fs: 15px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Cairo', 'Arial', sans-serif;
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    color: var(--gold);
+    min-height: 100vh;
+    direction: rtl;
+    font-size: var(--fs);
+  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
+  .header {
+    background: linear-gradient(135deg, rgba(10,50,20,0.97) 0%, rgba(6,30,12,0.99) 100%);
+    border-bottom: 2px solid rgba(212,175,55,0.4);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .header h1 { font-size: 1.1em; font-weight: 900; color: var(--gold); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .btn {
+    background: linear-gradient(135deg, var(--gold) 0%, #b8952d 100%);
+    color: #0a1a0f;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9em;
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--gold);
+    border: 1.5px solid rgba(212,175,55,0.5);
+    border-radius: 12px;
+    padding: 8px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.85em;
+  }
+  input, select, textarea {
+    background: rgba(10,40,18,0.8);
+    border: 1.5px solid rgba(212,175,55,0.35);
+    color: var(--gold);
+    border-radius: 12px;
+    padding: 8px 12px;
+    width: 100%;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9em;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: rgba(212,175,55,0.7); }
+  label { color: var(--gold-dim); font-size: 0.75em; display: block; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border: 1px solid rgba(212,175,55,0.2); padding: 6px 8px; text-align: right; font-size: 0.85em; }
+  th { background: rgba(212,175,55,0.1); color: var(--gold); font-weight: 700; }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent); margin: 12px 0; }
+  .section { padding: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .text-green { color: var(--green); }
+  .text-red { color: #ef4444; }
+  .text-gold { color: var(--gold); }
+  .font-bold { font-weight: 700; }
+  .font-black { font-weight: 900; }
+  .text-center { text-align: center; }
+  .mt-2 { margin-top: 8px; }
+  .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px; }
+  .menu-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--gold);
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    font-size: 0.85em;
+    transition: background 0.2s;
+  }
+  .menu-btn:hover { background: rgba(20,80,35,0.7); }
+  .menu-icon { font-size: 2em; }
+  .screen { display: none; }
+  .screen.active { display: flex; flex-direction: column; flex: 1; }
+  .screen-header {
+    background: linear-gradient(135deg, rgba(10,50,20,0.95) 0%, rgba(6,30,12,0.98) 100%);
+    border-bottom: 2px solid rgba(212,175,55,0.4);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .screen-title { font-size: 1em; font-weight: 900; color: var(--gold); }
+  .back-btn { background: transparent; border: 1px solid rgba(212,175,55,0.3); border-radius: 10px; padding: 6px 10px; color: var(--gold); cursor: pointer; }
+  .ticker {
+    background: linear-gradient(135deg, rgba(6,25,12,0.98) 0%, rgba(10,40,18,0.98) 100%);
+    border-top: 1px solid rgba(212,175,55,0.2);
+    padding: 6px 12px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    font-size: 0.75em;
+  }
+  .activation-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #0d2a14 0%, #060e08 60%, #020503 100%);
+  }
+  .activation-card {
+    background: linear-gradient(135deg, rgba(14,50,25,0.95) 0%, rgba(8,28,14,0.98) 100%);
+    border: 2px solid rgba(212,175,55,0.5);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(212,175,55,0.2);
+  }
+  .logo-placeholder {
+    width: 90px; height: 90px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #0d4a1f, #1a6e30);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5em;
+    margin: 0 auto 12px;
+    border: 2px solid rgba(212,175,55,0.5);
+  }
+  #activation-error { color: #ef4444; font-size: 0.8em; margin: 6px 0; }
+</style>
+</head>
+<body>
+
+<div id="activation-screen" class="activation-screen">
+  <div class="activation-card">
+    <div class="logo-placeholder">💰</div>
+    <h1 style="font-size:1.5em;font-weight:900;color:#D4AF37;margin-bottom:4px;">قـويــره سوفت</h1>
+    <p style="color:rgba(212,175,55,0.5);font-size:0.8em;margin-bottom:20px;">نظام المحاسبة المالي المتكامل</p>
+    <div class="divider"></div>
+    <p style="color:rgba(212,175,55,0.7);font-size:0.85em;margin:12px 0;">أدخل رمز التفعيل للمتابعة</p>
+    <input type="text" id="activation-code" placeholder="رمز التفعيل" style="text-align:center;font-size:1.1em;font-weight:700;letter-spacing:0.15em;margin-bottom:8px;" />
+    <p id="activation-error"></p>
+    <button class="btn" style="width:100%;margin-bottom:16px;" onclick="activate()">تفعيل البرنامج</button>
+    <div class="divider"></div>
+    <p style="color:rgba(212,175,55,0.6);font-size:0.8em;margin-top:12px;">للتفعيل تواصل معنا:</p>
+    <div style="margin-top:6px;">
+      <a href="tel:+967771096572" style="color:#22c55e;display:block;font-size:0.85em;" dir="ltr">+967 771 096 572</a>
+      <a href="tel:+967781055501" style="color:#22c55e;display:block;font-size:0.85em;" dir="ltr">+967 781 055 501</a>
+      <a href="tel:+967715107412" style="color:#22c55e;display:block;font-size:0.85em;" dir="ltr">+967 715 107 412</a>
+      <a href="tel:+967735162242" style="color:#22c55e;display:block;font-size:0.85em;" dir="ltr">+967 735 162 242</a>
+    </div>
+  </div>
+</div>
+
+<div id="main-app" style="display:none;" class="app">
+  <div class="header">
+    <button class="btn-outline" onclick="showSettings()" style="font-size:0.75em;padding:6px 10px;">⚙️ الإعدادات</button>
+    <h1 id="company-name-header">قـويــره سوفت</h1>
+    <span style="color:rgba(34,197,94,0.6);font-size:0.7em;" id="ops-counter">0/100</span>
+  </div>
+
+  <!-- HOME SCREEN -->
+  <div id="screen-home" class="screen active">
+    <div class="menu-grid">
+      <button class="menu-btn" onclick="navigateTo('screen-sales')">
+        <span class="menu-icon">📈</span>
+        <span>المبيعات</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-purchases')">
+        <span class="menu-icon">📦</span>
+        <span>المشتريات</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-vouchers')">
+        <span class="menu-icon">🧾</span>
+        <span>السندات والقيود</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-accounts')">
+        <span class="menu-icon">👥</span>
+        <span>الحسابات</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-products')">
+        <span class="menu-icon">🛒</span>
+        <span>الأصناف</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-reports')">
+        <span class="menu-icon">📊</span>
+        <span>التقارير</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-exchange')">
+        <span class="menu-icon">💱</span>
+        <span>مصارفة العملات</span>
+      </button>
+      <button class="menu-btn" onclick="navigateTo('screen-settings')">
+        <span class="menu-icon">⚙️</span>
+        <span>الإعدادات</span>
+      </button>
+    </div>
+    <div class="divider" style="margin:0 12px;"></div>
+    <div style="padding:8px 12px;">
+      <p style="color:rgba(212,175,55,0.5);font-size:0.75em;margin-bottom:4px;">أسعار العملات</p>
+      <div class="ticker" id="currency-ticker"></div>
+    </div>
+    <div class="divider" style="margin:4px 12px;"></div>
+    <div style="padding:8px 12px;text-align:center;">
+      <p style="color:rgba(212,175,55,0.4);font-size:0.7em;">قـويــره سوفت — النظام المحاسبي المتكامل</p>
+    </div>
+  </div>
+
+  <!-- INVOICES SCREEN -->
+  <div id="screen-sales" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title" id="invoice-screen-title">فاتورة مبيعات</span>
+      <div style="display:flex;gap:6px;">
+        <button class="btn-outline" onclick="toggleInvoiceMode()" style="font-size:0.75em;padding:6px 8px;">📋 السجل</button>
+        <button class="btn" onclick="saveInvoice()" style="font-size:0.85em;padding:8px 12px;">💾 حفظ</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;">
+      <div class="card">
+        <div class="grid-2" style="gap:6px;margin-bottom:8px;">
+          <button id="btn-credit" onclick="toggleCredit()" class="btn-outline" style="font-size:0.8em;">نقدي</button>
+          <button id="btn-return" onclick="toggleReturn()" class="btn-outline" style="font-size:0.8em;">مرتجع</button>
+        </div>
+        <div class="grid-2" style="gap:6px;">
+          <div>
+            <label>التاريخ</label>
+            <input type="date" id="invoice-date" />
+          </div>
+          <div>
+            <label>العملة</label>
+            <select id="invoice-currency" onchange="updateExchangeRate()"></select>
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <label>الحساب (العميل / المورد)</label>
+          <input type="text" id="invoice-account" placeholder="ابحث عن الحساب..." oninput="filterAccounts('invoice-account','account-suggestions')" />
+          <div id="account-suggestions" class="card" style="display:none;max-height:150px;overflow-y:auto;padding:4px;margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <button class="btn" onclick="addItem()" style="font-size:0.8em;padding:6px 10px;">+ إضافة صنف</button>
+          <span style="font-size:0.9em;font-weight:700;">الأصناف</span>
+        </div>
+        <div id="invoice-items"></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--gold-dim);">الإجمالي:</span><span id="inv-subtotal" class="font-bold">0</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <input type="number" id="inv-discount" placeholder="خصم" style="width:80px;" oninput="recalcInvoice()" />
+          <span style="color:var(--gold-dim);">خصم:</span>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;"><span style="font-weight:700;color:var(--gold);">الصافي:</span><span id="inv-total" class="font-black" style="font-size:1.1em;color:var(--gold);">0</span></div>
+        <div style="margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+          <input type="number" id="inv-paid" placeholder="المدفوع" style="width:80px;" oninput="recalcInvoice()" />
+          <span style="color:var(--gold-dim);">المدفوع:</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;"><span style="color:#ef4444;">المتبقي:</span><span id="inv-remaining" style="color:#ef4444;font-weight:700;">0</span></div>
+      </div>
+
+      <div class="card">
+        <label>ملاحظات</label>
+        <textarea id="invoice-notes" rows="2" placeholder="ملاحظات..."></textarea>
+        <label style="margin-top:8px;">نص أسفل الفاتورة</label>
+        <textarea id="invoice-bottom-notes" rows="2" placeholder="شكراً لتعاملكم معنا"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNTS SCREEN -->
+  <div id="screen-accounts" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">الحسابات</span>
+      <button class="btn" onclick="showAddAccount()" style="font-size:0.85em;padding:8px 12px;">+ حساب</button>
+    </div>
+    <div style="padding:8px 12px;">
+      <input type="text" placeholder="🔍 بحث بالاسم أو رقم الحساب" oninput="filterAccountsList(this.value)" />
+    </div>
+    <div id="accounts-list" style="flex:1;overflow-y:auto;padding:8px 12px;"></div>
+  </div>
+
+  <!-- REPORTS SCREEN -->
+  <div id="screen-reports" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">التقارير</span>
+      <div></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px;">
+      <div class="grid-2">
+        <button class="menu-btn" onclick="generateReport('trial-balance')"><span class="menu-icon">⚖️</span><span>ميزان المراجعة</span></button>
+        <button class="menu-btn" onclick="generateReport('income')"><span class="menu-icon">📈</span><span>قائمة الدخل</span></button>
+        <button class="menu-btn" onclick="generateReport('balance-sheet')"><span class="menu-icon">🏦</span><span>المركز المالي</span></button>
+        <button class="menu-btn" onclick="generateReport('sales')"><span class="menu-icon">🛒</span><span>تقرير المبيعات</span></button>
+        <button class="menu-btn" onclick="generateReport('purchases')"><span class="menu-icon">📦</span><span>تقرير المشتريات</span></button>
+        <button class="menu-btn" onclick="generateReport('cash')"><span class="menu-icon">💵</span><span>حركة النقدية</span></button>
+      </div>
+      <div id="report-output" class="card" style="margin-top:12px;display:none;"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div id="screen-settings" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">الإعدادات</span>
+      <div></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;">
+      <div class="card">
+        <label>اسم المنشأة</label>
+        <input type="text" id="settings-company" oninput="saveSettings()" />
+        <label style="margin-top:8px;">العنوان</label>
+        <input type="text" id="settings-address" oninput="saveSettings()" />
+        <label style="margin-top:8px;">الجوال</label>
+        <input type="tel" id="settings-phone" dir="ltr" oninput="saveSettings()" />
+      </div>
+      <div class="card">
+        <p style="font-weight:700;margin-bottom:8px;">خيارات الطباعة</p>
+        <label>مسمى المدين</label>
+        <input type="text" id="settings-debit-label" placeholder="مدين / عليه" oninput="saveSettings()" />
+        <label style="margin-top:8px;">مسمى الدائن</label>
+        <input type="text" id="settings-credit-label" placeholder="دائن / له" oninput="saveSettings()" />
+        <label style="margin-top:8px;">حجم الخط</label>
+        <select id="settings-font-size" onchange="saveSettings()">
+          <option value="small">صغير</option>
+          <option value="medium" selected>متوسط</option>
+          <option value="large">كبير</option>
+          <option value="xlarge">كبير جداً</option>
+        </select>
+      </div>
+      <div class="card">
+        <p style="font-weight:700;margin-bottom:8px;">نوع الإشعار</p>
+        <div class="grid-3" style="gap:6px;">
+          <button id="notif-whatsapp" onclick="setNotifType('whatsapp')" class="btn" style="font-size:0.75em;padding:6px;">💬 واتساب</button>
+          <button id="notif-sms" onclick="setNotifType('sms')" class="btn-outline" style="font-size:0.75em;padding:6px;">📱 رسالة</button>
+          <button id="notif-telegram" onclick="setNotifType('telegram')" class="btn-outline" style="font-size:0.75em;padding:6px;">✈️ تيليجرام</button>
+        </div>
+      </div>
+      <div class="card">
+        <p style="font-weight:700;margin-bottom:8px;">النسخ الاحتياطي</p>
+        <button class="btn" onclick="backupData()" style="width:100%;margin-bottom:6px;">💾 حفظ نسخة احتياطية</button>
+        <button class="btn-outline" onclick="document.getElementById('restore-input').click()" style="width:100%;">🔄 استرجاع نسخة احتياطية</button>
+        <input type="file" id="restore-input" accept=".json" style="display:none;" onchange="restoreData(this)" />
+      </div>
+    </div>
+  </div>
+
+  <!-- OTHER SCREENS (placeholder) -->
+  <div id="screen-purchases" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">فاتورة مشتريات</span>
+      <button class="btn" onclick="alert('استخدم النسخة الكاملة من التطبيق للمزيد')" style="font-size:0.8em;padding:6px 10px;">+ جديد</button>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+      <div style="font-size:3em;">📦</div>
+      <p class="text-gold font-bold">فاتورة مشتريات</p>
+      <p style="color:rgba(212,175,55,0.5);font-size:0.85em;text-align:center;">للاستخدام الكامل يرجى فتح<br/>التطبيق الرئيسي (React)</p>
+    </div>
+  </div>
+  <div id="screen-vouchers" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">السندات والقيود</span>
+      <div></div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+      <div style="font-size:3em;">🧾</div>
+      <p class="text-gold font-bold">السندات والقيود</p>
+      <p style="color:rgba(212,175,55,0.5);font-size:0.85em;text-align:center;">للاستخدام الكامل يرجى فتح<br/>التطبيق الرئيسي (React)</p>
+    </div>
+  </div>
+  <div id="screen-products" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">الأصناف</span>
+      <div></div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+      <div style="font-size:3em;">🛒</div>
+      <p class="text-gold font-bold">الأصناف والمخزون</p>
+      <p style="color:rgba(212,175,55,0.5);font-size:0.85em;text-align:center;">للاستخدام الكامل يرجى فتح<br/>التطبيق الرئيسي (React)</p>
+    </div>
+  </div>
+  <div id="screen-exchange" class="screen">
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">✕</button>
+      <span class="screen-title">مصارفة العملات</span>
+      <div></div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;">
+      <div style="font-size:3em;">💱</div>
+      <p class="text-gold font-bold">مصارفة العملات</p>
+      <p style="color:rgba(212,175,55,0.5);font-size:0.85em;text-align:center;">للاستخدام الكامل يرجى فتح<br/>التطبيق الرئيسي (React)</p>
+    </div>
+  </div>
+
+  <div class="ticker" id="bottom-ticker">
+    <span style="color:rgba(34,197,94,0.5);">عمليات: <span id="ops-count-ticker">0</span>/100</span>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = "qwairah_soft_data_v2";
+  const ACTIVATION_CODES = ["QWAIRAH2025", "735162242"];
+  const MAX_OPERATIONS = 100;
+
+  const defaultData = {
+    accounts: [
+      { id: "acc-cash", name: "الصندوق الرئيسي", type: "assets", subType: "cash", accountNumber: "1010", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-banks", name: "البنوك", type: "assets", subType: "banks", accountNumber: "1020", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-customers", name: "العملاء", type: "assets", subType: "customers", accountNumber: "1030", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-inventory", name: "المخزون", type: "assets", subType: "inventory", accountNumber: "1040", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-capital", name: "رأس المال", type: "equity", subType: "capital", accountNumber: "3010", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-suppliers", name: "الموردون", type: "equity", subType: "suppliers", accountNumber: "3040", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-sales", name: "المبيعات", type: "revenue", subType: "sales", accountNumber: "4010", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-purchases", name: "المشتريات", type: "expenses", subType: "costOfSales", accountNumber: "5010", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-expenses", name: "المصاريف العمومية", type: "expenses", subType: "operatingExpenses", accountNumber: "5040", phone: "", address: "", balance: 0, currency: "YER" },
+      { id: "acc-pnl", name: "الأرباح والخسائر", type: "equity", subType: "profitLoss", accountNumber: "3050", phone: "", address: "", balance: 0, currency: "YER" },
+    ],
+    invoices: [],
+    vouchers: [],
+    currencies: [
+      { code: "YER", name: "ريال يمني", rate: 1, isDefault: true },
+      { code: "USD", name: "دولار أمريكي", rate: 530 },
+      { code: "SAR", name: "ريال سعودي", rate: 141 },
+    ],
+    settings: {
+      companyName: "قـويــره سوفت",
+      address: "",
+      phone: "",
+      debitLabel: "مدين",
+      creditLabel: "دائن",
+      fontSize: "medium",
+      notificationType: "whatsapp",
+    },
+    operationsCount: 0,
+    isActivated: false,
+  };
+
+  let appData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || defaultData;
+  let currentScreen = "screen-home";
+  let invoiceIsCredit = false;
+  let invoiceIsReturn = false;
+  let invoiceItems = [];
+  let selectedInvoiceAccount = null;
+  let currentInvoiceType = "sale";
+
+  function saveAppData() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  }
+
+  function activate() {
+    const code = document.getElementById("activation-code").value.trim();
+    if (ACTIVATION_CODES.includes(code)) {
+      appData.isActivated = true;
+      appData.operationsCount = 0;
+      saveAppData();
+      document.getElementById("activation-screen").style.display = "none";
+      document.getElementById("main-app").style.display = "flex";
+      initApp();
+    } else {
+      document.getElementById("activation-error").textContent = "رمز التفعيل غير صحيح";
+    }
+  }
+
+  function initApp() {
+    updateCurrencyTicker();
+    renderAccountsList();
+    updateOpsCounter();
+    // Load settings
+    document.getElementById("settings-company").value = appData.settings.companyName || "";
+    document.getElementById("settings-address").value = appData.settings.address || "";
+    document.getElementById("settings-phone").value = appData.settings.phone || "";
+    document.getElementById("settings-debit-label").value = appData.settings.debitLabel || "مدين";
+    document.getElementById("settings-credit-label").value = appData.settings.creditLabel || "دائن";
+    document.getElementById("settings-font-size").value = appData.settings.fontSize || "medium";
+    document.getElementById("company-name-header").textContent = appData.settings.companyName || "قـويــره سوفت";
+    // Invoice date
+    document.getElementById("invoice-date").value = new Date().toISOString().split("T")[0];
+    // Currency options
+    const selects = document.querySelectorAll("#invoice-currency");
+    selects.forEach(sel => {
+      sel.innerHTML = appData.currencies.map(c => `<option value="${c.code}">${c.name}</option>`).join("");
+    });
+  }
+
+  function navigateTo(screenId) {
+    document.getElementById(currentScreen).classList.remove("active");
+    document.getElementById(screenId).classList.add("active");
+    currentScreen = screenId;
+    if (screenId === "screen-sales") {
+      currentInvoiceType = "sale";
+      document.getElementById("invoice-screen-title").textContent = invoiceIsCredit ? "بيع آجل" : "بيع نقدي";
+    }
+  }
+
+  function goBack() {
+    document.getElementById(currentScreen).classList.remove("active");
+    document.getElementById("screen-home").classList.add("active");
+    currentScreen = "screen-home";
+  }
+
+  function showSettings() { navigateTo("screen-settings"); }
+
+  function toggleCredit() {
+    invoiceIsCredit = !invoiceIsCredit;
+    const btn = document.getElementById("btn-credit");
+    btn.textContent = invoiceIsCredit ? "✓ آجل" : "نقدي";
+    btn.style.borderColor = invoiceIsCredit ? "rgba(212,175,55,0.7)" : "rgba(212,175,55,0.3)";
+    document.getElementById("invoice-screen-title").textContent =
+      invoiceIsCredit ? (currentInvoiceType === "sale" ? "بيع آجل" : "شراء آجل")
+                       : (currentInvoiceType === "sale" ? "بيع نقدي" : "شراء نقدي");
+  }
+
+  function toggleReturn() {
+    invoiceIsReturn = !invoiceIsReturn;
+    const btn = document.getElementById("btn-return");
+    btn.textContent = invoiceIsReturn ? "✓ مرتجع" : "مرتجع";
+    btn.style.borderColor = invoiceIsReturn ? "rgba(239,68,68,0.7)" : "rgba(212,175,55,0.3)";
+  }
+
+  function addItem() {
+    invoiceItems.push({ name: "", qty: 1, price: 0, unit: "قطعة", total: 0 });
+    renderInvoiceItems();
+  }
+
+  function renderInvoiceItems() {
+    const container = document.getElementById("invoice-items");
+    container.innerHTML = invoiceItems.map((item, i) => `
+      <div class="card" style="margin-bottom:6px;">
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input style="flex:1;" type="text" value="${item.name}" placeholder="اسم الصنف" oninput="updateItem(${i},'name',this.value)" />
+          <button onclick="removeItem(${i})" style="background:transparent;border:1px solid rgba(239,68,68,0.4);border-radius:8px;padding:4px 8px;color:#ef4444;cursor:pointer;">✕</button>
+        </div>
+        <div class="grid-3" style="gap:4px;margin-top:4px;">
+          <input type="number" value="${item.qty}" placeholder="الكمية" oninput="updateItem(${i},'qty',+this.value)" />
+          <input type="number" value="${item.price}" placeholder="السعر" oninput="updateItem(${i},'price',+this.value)" />
+          <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);border-radius:12px;padding:8px;text-align:center;font-weight:700;">${(item.qty*item.price).toLocaleString("ar")}</div>
+        </div>
+      </div>
+    `).join("");
+    recalcInvoice();
+  }
+
+  function updateItem(idx, field, val) {
+    invoiceItems[idx][field] = val;
+    invoiceItems[idx].total = invoiceItems[idx].qty * invoiceItems[idx].price;
+    renderInvoiceItems();
+  }
+
+  function removeItem(idx) {
+    invoiceItems.splice(idx, 1);
+    renderInvoiceItems();
+  }
+
+  function recalcInvoice() {
+    const subtotal = invoiceItems.reduce((s, i) => s + i.total, 0);
+    const discount = +document.getElementById("inv-discount").value || 0;
+    const paid = +document.getElementById("inv-paid").value || 0;
+    const total = subtotal - discount;
+    document.getElementById("inv-subtotal").textContent = subtotal.toLocaleString("ar");
+    document.getElementById("inv-total").textContent = total.toLocaleString("ar");
+    document.getElementById("inv-remaining").textContent = Math.max(0, total - paid).toLocaleString("ar");
+  }
+
+  function saveInvoice() {
+    if (invoiceItems.length === 0) { alert("يرجى إضافة صنف واحد على الأقل"); return; }
+    if (appData.operationsCount >= MAX_OPERATIONS) { alert("تم الوصول للحد الأقصى من العمليات (100). تواصل معنا للتجديد."); return; }
+
+    const subtotal = invoiceItems.reduce((s, i) => s + i.total, 0);
+    const discount = +document.getElementById("inv-discount").value || 0;
+    const paid = +document.getElementById("inv-paid").value || 0;
+    const total = subtotal - discount;
+
+    const invoice = {
+      id: Date.now().toString(36),
+      type: invoiceIsReturn ? (currentInvoiceType === "sale" ? "sale-return" : "purchase-return") : currentInvoiceType,
+      invoiceNumber: (currentInvoiceType === "sale" ? "INV" : "PUR") + String(appData.invoices.length + 1).padStart(5, "0"),
+      accountName: document.getElementById("invoice-account").value,
+      date: document.getElementById("invoice-date").value,
+      items: [...invoiceItems],
+      subtotal, discount, total, paid,
+      remaining: Math.max(0, total - paid),
+      currency: document.getElementById("invoice-currency").value,
+      isCredit: invoiceIsCredit, isReturn: invoiceIsReturn,
+      notes: document.getElementById("invoice-notes").value,
+      bottomNotes: document.getElementById("invoice-bottom-notes").value,
+    };
+
+    appData.invoices.push(invoice);
+    appData.operationsCount++;
+    saveAppData();
+    updateOpsCounter();
+    alert("تم حفظ الفاتورة بنجاح ✓");
+    invoiceItems = [];
+    renderInvoiceItems();
+    document.getElementById("invoice-notes").value = "";
+    document.getElementById("invoice-bottom-notes").value = "";
+    document.getElementById("inv-discount").value = "";
+    document.getElementById("inv-paid").value = "";
+    recalcInvoice();
+  }
+
+  function toggleInvoiceMode() {
+    const list = appData.invoices.filter(i => i.type === currentInvoiceType || i.type === currentInvoiceType + "-return");
+    if (list.length === 0) { alert("لا توجد فواتير محفوظة"); return; }
+    const win = window.open("", "_blank");
+    const rows = list.slice().reverse().map(inv => `
+      <tr>
+        <td>${inv.invoiceNumber}</td>
+        <td>${inv.date}</td>
+        <td>${inv.accountName}</td>
+        <td>${inv.total.toLocaleString("ar")} ${inv.currency}</td>
+        <td>${inv.isCredit ? "آجل" : "نقد"}</td>
+      </tr>`).join("");
+    win.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>سجل الفواتير</title>
+      <style>body{font-family:'Cairo',Arial;padding:16px;direction:rtl}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:6px;text-align:right}th{background:#f0f0f0}@media print{button{display:none}}</style></head>
+      <body><button onclick="window.print()">🖨️ طباعة</button><h2>سجل الفواتير</h2><table><thead><tr><th>الرقم</th><th>التاريخ</th><th>الحساب</th><th>الإجمالي</th><th>النوع</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+    win.document.close();
+  }
+
+  function updateCurrencyTicker() {
+    const ticker = document.getElementById("currency-ticker");
+    const defCurrency = appData.currencies.find(c => c.isDefault);
+    ticker.innerHTML = appData.currencies.map(c =>
+      `<span style="flex-shrink:0"><strong style="color:rgba(34,197,94,0.8)">${c.code}</strong> <span style="color:rgba(212,175,55,0.5)">=</span> <strong style="color:#D4AF37">${c.isDefault ? "رسمية" : c.rate.toLocaleString("ar") + " " + (defCurrency?.code || "")}</strong></span>`
+    ).join("");
+
+    const bticker = document.getElementById("bottom-ticker");
+    if (bticker) {
+      bticker.innerHTML = `<span style="color:rgba(34,197,94,0.5)">عمليات: <span id="ops-count-ticker">${appData.operationsCount}</span>/100</span>` +
+        appData.currencies.map(c => `<span style="flex-shrink:0"><strong style="color:rgba(34,197,94,0.8)">${c.code}</strong>=<strong style="color:#D4AF37">${c.isDefault ? "رسمية" : c.rate}</strong></span>`).join("");
+    }
+  }
+
+  function updateOpsCounter() {
+    const el = document.getElementById("ops-counter");
+    if (el) el.textContent = `${appData.operationsCount}/${MAX_OPERATIONS}`;
+    const ticker = document.getElementById("ops-count-ticker");
+    if (ticker) ticker.textContent = appData.operationsCount;
+  }
+
+  function renderAccountsList() {
+    const list = document.getElementById("accounts-list");
+    if (!list) return;
+    list.innerHTML = appData.accounts.map(acc => `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div>
+          <p style="font-weight:700;font-size:0.9em;">${acc.name}</p>
+          <p style="color:rgba(212,175,55,0.5);font-size:0.75em;">${acc.accountNumber} ${acc.phone ? "| " + acc.phone : ""}</p>
+        </div>
+        <p style="font-weight:900;color:${acc.balance >= 0 ? "#22c55e" : "#ef4444"}">${acc.balance.toLocaleString("ar")}</p>
+      </div>
+    `).join("");
+  }
+
+  function filterAccountsList(query) {
+    const filtered = appData.accounts.filter(a =>
+      a.name.includes(query) || a.accountNumber.includes(query) || (a.phone && a.phone.includes(query))
+    );
+    const list = document.getElementById("accounts-list");
+    list.innerHTML = filtered.map(acc => `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div>
+          <p style="font-weight:700;font-size:0.9em;">${acc.name}</p>
+          <p style="color:rgba(212,175,55,0.5);font-size:0.75em;">${acc.accountNumber}</p>
+        </div>
+        <p style="font-weight:900;color:${acc.balance >= 0 ? "#22c55e" : "#ef4444"}">${acc.balance.toLocaleString("ar")}</p>
+      </div>
+    `).join("");
+  }
+
+  function filterAccounts(inputId, suggestionsId) {
+    const val = document.getElementById(inputId).value.toLowerCase();
+    const sugg = document.getElementById(suggestionsId);
+    if (!val) { sugg.style.display = "none"; return; }
+    const matches = appData.accounts.filter(a => a.name.includes(val) || a.accountNumber.includes(val));
+    sugg.style.display = matches.length ? "block" : "none";
+    sugg.innerHTML = matches.slice(0, 6).map(a =>
+      `<div style="padding:6px 8px;cursor:pointer;border-bottom:1px solid rgba(212,175,55,0.1);" onclick="selectAccount('${a.id}','${a.name}','${inputId}','${suggestionsId}')">${a.name} <span style="color:rgba(212,175,55,0.4);font-size:0.8em">${a.accountNumber}</span></div>`
+    ).join("");
+  }
+
+  function selectAccount(id, name, inputId, suggestionsId) {
+    document.getElementById(inputId).value = name;
+    document.getElementById(suggestionsId).style.display = "none";
+    selectedInvoiceAccount = id;
+  }
+
+  function showAddAccount() {
+    const name = prompt("اسم الحساب:");
+    if (!name) return;
+    const phone = prompt("رقم الجوال (اختياري):") || "";
+    const newAcc = {
+      id: Date.now().toString(36),
+      name, phone,
+      type: "assets", subType: "customers",
+      accountNumber: "1" + String(appData.accounts.length + 1).padStart(3, "0"),
+      address: "", balance: 0, currency: "YER",
+    };
+    appData.accounts.push(newAcc);
+    saveAppData();
+    renderAccountsList();
+    alert("تم إضافة الحساب بنجاح ✓");
+  }
+
+  function generateReport(type) {
+    const output = document.getElementById("report-output");
+    output.style.display = "block";
+    const totalSales = appData.invoices.filter(i => i.type === "sale").reduce((s, i) => s + i.total, 0);
+    const totalPurchases = appData.invoices.filter(i => i.type === "purchase").reduce((s, i) => s + i.total, 0);
+    const totalReceipts = appData.vouchers.filter(v => v.type === "receipt").reduce((s, v) => s + v.amount, 0);
+    const totalPayments = appData.vouchers.filter(v => v.type === "payment").reduce((s, v) => s + v.amount, 0);
+    const profit = totalSales - totalPurchases;
+
+    const reports = {
+      "trial-balance": `<h3>ميزان المراجعة</h3><div class="divider"></div>
+        ${appData.accounts.map(a => `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(212,175,55,0.1)"><span>${a.name}</span><span style="color:${a.balance>=0?"#22c55e":"#ef4444"}">${a.balance.toLocaleString("ar")} ${a.currency}</span></div>`).join("")}`,
+      "income": `<h3>قائمة الدخل</h3><div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;"><span>إجمالي المبيعات:</span><span class="text-green">${totalSales.toLocaleString("ar")}</span></div>
+        <div style="display:flex;justify-content:space-between;"><span>إجمالي المشتريات:</span><span style="color:#ef4444">${totalPurchases.toLocaleString("ar")}</span></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;"><span>صافي الربح:</span><span style="color:${profit>=0?"#22c55e":"#ef4444"}">${profit.toLocaleString("ar")}</span></div>`,
+      "balance-sheet": `<h3>المركز المالي</h3><div class="divider"></div>
+        <div>
+          <p style="font-weight:700;margin-bottom:4px;">الأصول:</p>
+          ${appData.accounts.filter(a => a.type === "assets").map(a => `<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${a.name}</span><span class="text-green">${a.balance.toLocaleString("ar")}</span></div>`).join("")}
+        </div>
+        <div class="divider"></div>
+        <div>
+          <p style="font-weight:700;margin-bottom:4px;">الالتزامات وحقوق الملكية:</p>
+          ${appData.accounts.filter(a => a.type === "equity").map(a => `<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${a.name}</span><span style="color:#D4AF37">${a.balance.toLocaleString("ar")}</span></div>`).join("")}
+        </div>`,
+      "sales": `<h3>تقرير المبيعات</h3><div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;"><span>عدد الفواتير:</span><span class="text-gold">${appData.invoices.filter(i => i.type === "sale").length}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-weight:700;"><span>إجمالي المبيعات:</span><span class="text-green">${totalSales.toLocaleString("ar")}</span></div>`,
+      "purchases": `<h3>تقرير المشتريات</h3><div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;"><span>عدد الفواتير:</span><span class="text-gold">${appData.invoices.filter(i => i.type === "purchase").length}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-weight:700;"><span>إجمالي المشتريات:</span><span style="color:#ef4444">${totalPurchases.toLocaleString("ar")}</span></div>`,
+      "cash": `<h3>حركة النقدية</h3><div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;"><span>إجمالي المقبوضات:</span><span class="text-green">${totalReceipts.toLocaleString("ar")}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;"><span>إجمالي المصروفات:</span><span style="color:#ef4444">${totalPayments.toLocaleString("ar")}</span></div>
+        <div class="divider"></div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;"><span>صافي النقدية:</span><span style="color:${totalReceipts-totalPayments>=0?"#22c55e":"#ef4444"}">${(totalReceipts-totalPayments).toLocaleString("ar")}</span></div>`,
+    };
+
+    output.innerHTML = reports[type] || "<p>التقرير غير متاح</p>";
+  }
+
+  function saveSettings() {
+    appData.settings.companyName = document.getElementById("settings-company").value;
+    appData.settings.address = document.getElementById("settings-address").value;
+    appData.settings.phone = document.getElementById("settings-phone").value;
+    appData.settings.debitLabel = document.getElementById("settings-debit-label").value;
+    appData.settings.creditLabel = document.getElementById("settings-credit-label").value;
+    appData.settings.fontSize = document.getElementById("settings-font-size").value;
+    document.getElementById("company-name-header").textContent = appData.settings.companyName || "قـويــره سوفت";
+    saveAppData();
+  }
+
+  function setNotifType(type) {
+    appData.settings.notificationType = type;
+    saveAppData();
+    ["whatsapp","sms","telegram"].forEach(t => {
+      const btn = document.getElementById("notif-" + t);
+      if (btn) {
+        btn.className = t === type ? "btn" : "btn-outline";
+        btn.style.fontSize = "0.75em";
+        btn.style.padding = "6px";
+      }
+    });
+  }
+
+  function backupData() {
+    const blob = new Blob([JSON.stringify(appData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "qwairah_backup_" + new Date().toISOString().split("T")[0] + ".json";
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("تم حفظ النسخة الاحتياطية بنجاح");
+  }
+
+  function restoreData(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const restored = JSON.parse(e.target.result);
+        if (confirm("هل أنت متأكد من استرجاع النسخة الاحتياطية؟")) {
+          appData = { ...restored, isActivated: true };
+          saveAppData();
+          initApp();
+          renderAccountsList();
+          alert("تم استرجاع النسخة الاحتياطية بنجاح");
+        }
+      } catch { alert("ملف غير صالح"); }
+    };
+    reader.readAsText(file);
+  }
+
+  // Initialize
+  if (appData.isActivated) {
+    document.getElementById("activation-screen").style.display = "none";
+    document.getElementById("main-app").style.display = "flex";
+    initApp();
+  }
+
+  document.getElementById("activation-code").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") activate();
+  });
+</script>
+</body>
+</html>
